@@ -1,12 +1,13 @@
 package com.guimu.alpha.appender;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.Layout;
 import com.guimu.alpha.model.LogEsBase;
 import com.guimu.alpha.service.EsService;
 import com.guimu.alpha.utils.RedisUtils;
-import com.guimu.alpha.utils.ThreUtils;
+import com.guimu.alpha.utils.ThreadUtils;
 import lombok.Data;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -30,11 +31,13 @@ public class LogAppender extends AppenderBase<ILoggingEvent> implements Applicat
 
     @Override
     protected void append(ILoggingEvent event) {
+        //TODO Level.DEBUG.isGreaterOrEqual(event.getLevel()) 从线程变量中获取当前需要获取的日志级别
+        Level.toLevel(ThreadUtils.threadLocal.get().getLevelStr());
         this.init();
         String txt = this.layout.doLayout(event);
         LogEsBase logEsBase = new LogEsBase();
+        String val = "12";
         logEsBase.setLogMsg(txt);
-        String val = ThreUtils.threadLocal.get();
         if (StringUtils.isEmpty(val)) {
             return;
         }

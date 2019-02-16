@@ -3,7 +3,7 @@ package com.guimu.alpha.controller;
 import com.guimu.alpha.model.LogEsBase;
 import com.guimu.alpha.service.EsService;
 import com.guimu.alpha.utils.RedisUtils;
-import com.guimu.alpha.utils.ThreUtils;
+import com.guimu.alpha.utils.ThreadUtils;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
@@ -20,6 +20,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * @Description: 测试controller
@@ -32,14 +33,19 @@ public class TestController {
 
     @Autowired
     private RedisUtils redisUtils;
-
+    @Autowired
+    private RestTemplate restTemplate;
     @Autowired
     private EsService esService;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @RequestMapping(value = "alpha")
     public String alHe(@RequestParam String name) {
-        logger.info("alpha" + name);
+//        logger.info("alpha" + name);
+        String url = "http://localhost:9900/hello";
+        String restlt = restTemplate
+            .getForObject(url + "?msg={1}", String.class, "msg param1");
+        System.out.println(restlt);
         return "alpha" + name;
     }
 
@@ -74,7 +80,7 @@ public class TestController {
 
     @RequestMapping(value = "down")
     public void downloadNet(HttpServletResponse response) {
-        String text = this.red(ThreUtils.threadLocal.get());
+        String text = this.red(ThreadUtils.threadLocal.get().getBatchNo());
         if (StringUtils.isEmpty(text)) {
             return;
         }

@@ -16,4 +16,5 @@ public class LogEsBase {
 
     private String userId;//用户id
     private String logMsg;//日志详情
+    private String batchNo;//生产批号，表示某一次录制的时间批号
 }

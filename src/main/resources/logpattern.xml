@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 定义通用日志pattern -->
+<included>
+
+  <conversionRule conversionWord="yyEx"
+    converterClass="com.guimu.alpha.log.YYWhitespaceThrowableProxyConverter"/>
+
+  <!-- 定义变量LOG_HOME用于配置log日志生成的目录 -->
+  <property name="LOG_HOME" value="/tmp/logs/"/>
+  <!-- 滚动历史文件个数 -->
+  <property name="MAX_HIS" value="7"/>
+  <!-- 定义输出日志的格式 -->
+  <property name="EINVOICE_CNSL_PATTERN"
+    value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} [%X{request_id:-EMPTY}] [%X{current_user_id:-EMPTY}] %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(-){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%yyEx}"/>
+  <property name="EINVOICE_LOG_PATTERN"
+    value="%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } [%X{request_id:-EMPTY}] [%X{current_user_id:-EMPTY}] [%t] %-40.40logger{39} - %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%yyEx}"/>
+
+</included>

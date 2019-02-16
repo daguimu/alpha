@@ -1,6 +1,7 @@
 package com.guimu.alpha.interceptor;
 
-import com.guimu.alpha.utils.ThreUtils;
+import com.guimu.alpha.dto.ReLogDto;
+import com.guimu.alpha.utils.ThreadUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -24,8 +25,13 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
         throws Exception {
         /* //TODO 做是否登录验证，验证通过返回true。验证失败返回false。
          */
-        String val = request.getHeader("tokenId");
-        ThreUtils.threadLocal.set(val);
+        String val = request.getHeader("levelStr");
+        ReLogDto reLogDto = new ReLogDto();
+        //TODO 此处还需修改
+        reLogDto.setLevelStr("DEBUG");
+        reLogDto.setBatchNo(Long.toString(System.currentTimeMillis()));
+        reLogDto.setUserId(137 + "");
+        ThreadUtils.threadLocal.set(reLogDto);
         LOGGER.info("请求访问接口:" + request.getRequestURL());
         return true;
     }

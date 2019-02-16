@@ -1,64 +1,70 @@
-<?xml version="1.0" encoding="utf-8"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <appender name="consoleLog" class="ch.qos.logback.core.ConsoleAppender">
-    <layout class="ch.qos.logback.classic.PatternLayout">
-      <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %5p %c{5}:%L - %m%n</pattern>
-    </layout>
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+  <include resource="logpattern.xml"/>
+  <!-- 定义变量APP_NAME用于区分不同应用的的记录 -->
+  <property name="APP_NAME" value="service-output-tax"/>
+  <contextName>${APP_NAME}</contextName>
+
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${EINVOICE_CNSL_PATTERN}</pattern>
+      <charset>utf8</charset>
+    </encoder>
   </appender>
-  <appender name="MyLog" class="com.guimu.alpha.appender.LogAppender">
+
+  <!-- 滚动日志 -->
+  <appender name="FILE"
+    class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_HOME}/${APP_NAME}.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_HOME}/${APP_NAME}.%d{yyyy-MM-dd}.log
+      </fileNamePattern>
+      <maxHistory>${MAX_HIS}</maxHistory>
+    </rollingPolicy>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <pattern>${EINVOICE_LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <!-- 错误日志 -->
+  <appender name="ERROR_FILE"
+    class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_HOME}/${APP_NAME}.error.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_HOME}/${APP_NAME}.error.%d{yyyy-MM-dd}.log
+      </fileNamePattern>
+      <maxHistory>${MAX_HIS}</maxHistory>
+    </rollingPolicy>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <pattern>${EINVOICE_LOG_PATTERN}</pattern>
+    </encoder>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <!-- 日志收集最低日志级别 -->
-      <level>INFO</level>
+      <level>WARN</level>
+    </filter>
+  </appender>
+
+  <appender name="MyLog" class="com.guimu.alpha.appender.LogAppender">
+    <!--<encoder>-->
+    <!--<pattern>${EINVOICE_CNSL_PATTERN}</pattern>-->
+    <!--<charset>utf8</charset>-->
+    <!--</encoder>-->
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>DEBUG</level>
     </filter>
     <layout
       class="ch.qos.logback.classic.PatternLayout">
       <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
       <!--<pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n</pattern>-->
-      <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %5p %c{5}:%L - %m%n</pattern>
+      <pattern>${EINVOICE_CNSL_PATTERN}</pattern>
     </layout>
   </appender>
 
-  <appender name="fileInfoLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <filter class="ch.qos.logback.classic.filter.LevelFilter">
-      <level>INFO</level>
-      <onMatch>DENY</onMatch>
-      <onMismatch>ACCEPT</onMismatch>
-    </filter>
-    <!--滚动策略-->
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <!--路径-->
-      <fileNamePattern>logs/alpha/info.%d{yyyy-MM-dd}.log</fileNamePattern>
-      <maxHistory>30</maxHistory>
-    </rollingPolicy>
-    <encoder>
-      <pattern>%date [%thread] %level %logger{10} [%file : %line] %msg%n</pattern>
-    </encoder>
-  </appender>
-  <appender name="fileErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>ERROR</level>
-    </filter>
-    <encoder>
-      <pattern>%date [%thread] %level %logger{10} [%file : %line] %msg%n</pattern>
-    </encoder>
-    <!--滚动策略-->
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <!--路径-->
-      <fileNamePattern>logs/alpha/error.%d{yyyy-MM-dd}.log</fileNamePattern>
-      <maxHistory>30</maxHistory>
-    </rollingPolicy>
-  </appender>
 
-  <!--mybatis sql打印 -->
-  <logger name="com.life.service.mapper" level="debug"/>
-  <logger name="org.mybatis">
-    <level value="TRACE"/>
-  </logger>
-  <root level="info">
-    <appender-ref ref="consoleLog"/>
-    <appender-ref ref="fileInfoLog"/>
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
     <appender-ref ref="MyLog"/>
-    <appender-ref ref="fileErrorLog"/>
+    <appender-ref ref="ERROR_FILE"/>
   </root>
 </configuration>
