@@ -10,6 +10,7 @@ import lombok.Data;
 @Data
 public class ReLogDto {
 
+
     private String batchNo;//日志录制批号,可根据时间戳转换得到
     private String userId;//用户id
     private String levelStr;//字符串表示的日志级别,不区分大小写
