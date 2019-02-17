@@ -33,9 +33,9 @@ public class LogAppender extends AppenderBase<ILoggingEvent> implements Applicat
 
     @Override
     protected void append(ILoggingEvent event) {
-        Level targetLevel = Level.toLevel(ThreadUtils.threadLocal.get().getLevelStr());
         //如果当前需要的日志级别比event的日志界别低,则返回
-        if (!event.getLevel().isGreaterOrEqual(targetLevel)) {
+        if (StringUtils.isEmpty(ThreadUtils.threadLocal.get().getLevelStr()) || !event.getLevel()
+            .isGreaterOrEqual(Level.toLevel(ThreadUtils.threadLocal.get().getLevelStr()))) {
             return;
         }
         this.init();

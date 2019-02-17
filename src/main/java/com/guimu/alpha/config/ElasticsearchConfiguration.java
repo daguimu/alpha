@@ -6,10 +6,13 @@ package com.guimu.alpha.config;
  * @create: 2018/07/31 01:14:58
  **/
 
+import java.io.IOException;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -20,6 +23,7 @@ import org.springframework.context.annotation.Configuration;
 public class ElasticsearchConfiguration implements FactoryBean<RestHighLevelClient>,
     InitializingBean, DisposableBean {
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
     //@Value("${spring.data.elasticsearch.cluster-nodes}")
     private String clusterNodes = "127.0.0.1:9200";
 //    private String clusterNodes = "172.20.10.2:9200";
@@ -29,9 +33,6 @@ public class ElasticsearchConfiguration implements FactoryBean<RestHighLevelClie
 
     /**
      * 控制Bean的实例化过程
-     *
-     * @return
-     * @throws Exception
      */
     @Override
     public RestHighLevelClient getObject() {
@@ -40,8 +41,6 @@ public class ElasticsearchConfiguration implements FactoryBean<RestHighLevelClie
 
     /**
      * 获取接口返回的实例的class
-     *
-     * @return
      */
     @Override
     public Class<?> getObjectType() {
@@ -49,13 +48,13 @@ public class ElasticsearchConfiguration implements FactoryBean<RestHighLevelClie
     }
 
     @Override
-    public void destroy() throws Exception {
+    public void destroy() {
         try {
             if (restClient != null) {
                 restClient.close();
             }
-        } catch (final Exception e) {
-            System.out.println("Error closing ElasticSearch client: ");
+        } catch (final IOException e) {
+            logger.error("Error closing ElasticSearch client: ", e);
         }
     }
 
@@ -72,10 +71,10 @@ public class ElasticsearchConfiguration implements FactoryBean<RestHighLevelClie
     private RestHighLevelClient buildClient() {
         try {
             RestClientBuilder restClientBuilder = RestClient.builder(
-                    new HttpHost(
-                            clusterNodes.split(":")[0],
-                            Integer.parseInt(clusterNodes.split(":")[1]),
-                            "http")).setRequestConfigCallback((builder) -> {
+                new HttpHost(
+                    clusterNodes.split(":")[0],
+                    Integer.parseInt(clusterNodes.split(":")[1]),
+                    "http")).setRequestConfigCallback((builder) -> {
                 builder.setConnectTimeout(5000);
                 builder.setSocketTimeout(40000);
                 builder.setConnectionRequestTimeout(1000);
@@ -84,7 +83,7 @@ public class ElasticsearchConfiguration implements FactoryBean<RestHighLevelClie
             restClient = restClientBuilder.build();
             restHighLevelClient = new RestHighLevelClient(restClient);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error("ElasticSearch 初始化创建RestHighLevelClient异常", e);
         }
         return restHighLevelClient;
     }
