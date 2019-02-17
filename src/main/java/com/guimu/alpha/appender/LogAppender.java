@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.Layout;
+import com.guimu.alpha.dto.ReLogDto;
 import com.guimu.alpha.model.LogEsBase;
 import com.guimu.alpha.service.EsService;
 import com.guimu.alpha.utils.RedisUtils;
@@ -24,6 +25,7 @@ import org.springframework.util.StringUtils;
 @Service
 public class LogAppender extends AppenderBase<ILoggingEvent> implements ApplicationContextAware {
 
+    private final String LOG_DIR = "log_ticket:";
     private static ApplicationContext applicationContext;
     private EsService esService;
     private RedisUtils redisUtils;
@@ -31,22 +33,22 @@ public class LogAppender extends AppenderBase<ILoggingEvent> implements Applicat
 
     @Override
     protected void append(ILoggingEvent event) {
-        //TODO Level.DEBUG.isGreaterOrEqual(event.getLevel()) 从线程变量中获取当前需要获取的日志级别
-        Level.toLevel(ThreadUtils.threadLocal.get().getLevelStr());
-        this.init();
-        String txt = this.layout.doLayout(event);
-        LogEsBase logEsBase = new LogEsBase();
-        String val = "12";
-        logEsBase.setLogMsg(txt);
-        if (StringUtils.isEmpty(val)) {
+        Level targetLevel = Level.toLevel(ThreadUtils.threadLocal.get().getLevelStr());
+        //如果当前需要的日志级别比event的日志界别低,则返回
+        if (!event.getLevel().isGreaterOrEqual(targetLevel)) {
             return;
         }
-        boolean flag = false;
-        logEsBase.setUserId(val);
-        if (!StringUtils.isEmpty(redisUtils.get("tokenId:" + val))) {
-            flag = esService.addOne(logEsBase);
+        this.init();
+        String txt = this.layout.doLayout(event);
+        LogEsBase logEsBase = this.reLogDtoConventer(ThreadUtils.threadLocal.get());
+        logEsBase.setLogMsg(txt);
+        if (StringUtils.isEmpty(logEsBase.getUserId()) || StringUtils
+            .isEmpty(logEsBase.getBatchNo())) {
+            return;
         }
-        System.out.println(flag);
+        if (!StringUtils.isEmpty(redisUtils.get(LOG_DIR + logEsBase.getBatchNo()))) {
+            esService.addOne(logEsBase);
+        }
     }
 
     @Override
@@ -62,4 +64,12 @@ public class LogAppender extends AppenderBase<ILoggingEvent> implements Applicat
             esService = (EsService) applicationContext.getBean("EsServiceImpl");
         }
     }
+
+    private LogEsBase reLogDtoConventer(ReLogDto reLogDto) {
+        LogEsBase logEsBase = new LogEsBase();
+        logEsBase.setUserId(reLogDto.getUserId());
+        logEsBase.setBatchNo(reLogDto.getBatchNo());
+        return logEsBase;
+    }
+
 }

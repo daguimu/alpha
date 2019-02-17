@@ -57,7 +57,7 @@ public class EsServiceImpl implements EsService {
 
     @Override
     public List<LogEsBase> getAllByBase(LogEsBase condition) {
-        return this.queryBaseByUserId(condition.getType(), condition.getUserId());
+        return this.queryBaseByUserIdAndBatchNo(condition);
     }
 
     /**
@@ -67,8 +67,8 @@ public class EsServiceImpl implements EsService {
      * @Author: Guimu
      * @Date: 2018/7/31  下午2:21
      */
-    public List<LogEsBase> queryBaseByUserId(String type, String userId) {
-        return baseQuery(this.getSearchRequestByUserId(type, userId));
+    public List<LogEsBase> queryBaseByUserIdAndBatchNo(LogEsBase condition) {
+        return baseQuery(this.getSearchRequestByUserIdAndBatchNo(condition));
     }
 
     /**
@@ -78,8 +78,8 @@ public class EsServiceImpl implements EsService {
      * @Return: java.util.List<com.guimu.alpha.model.LogEsBase>
      * @Date: 2019-02-16 14:01
      */
-    public List<String> queryIdsByUserId(String type, String userId) {
-        return baseQueryIds(this.getSearchRequestByUserId(type, userId));
+    public List<String> queryIdsByUserIdAndBatchNo(LogEsBase condition) {
+        return baseQueryIds(this.getSearchRequestByUserIdAndBatchNo(condition));
     }
 
 
@@ -90,15 +90,17 @@ public class EsServiceImpl implements EsService {
      * @Return: org.elasticsearch.action.search.SearchRequest
      * @Date: 2019-02-16 13:58
      */
-    private SearchRequest getSearchRequestByUserId(String type, String userId) {
-        MatchPhraseQueryBuilder mb = QueryBuilders.matchPhraseQuery("userId", userId);
-        QueryBuilder queryBuilder = QueryBuilders.boolQuery().must(mb);
+    private SearchRequest getSearchRequestByUserIdAndBatchNo(LogEsBase condition) {
+        MatchPhraseQueryBuilder mb = QueryBuilders
+            .matchPhraseQuery("userId", condition.getUserId());
+        QueryBuilder queryBuilder = QueryBuilders.boolQuery().must(mb)
+            .must(QueryBuilders.matchPhraseQuery("batchNo", condition.getBatchNo()));
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.query(queryBuilder);
         SearchRequest searchRequest = new SearchRequest(DEFAULT_INDEX);
         searchSourceBuilder.from(0);
         searchSourceBuilder.size(this.getCount(searchRequest).intValue());
-        searchRequest.types(type);
+        searchRequest.types(condition.getType());
         searchRequest.source(searchSourceBuilder);
         return searchRequest;
     }
@@ -196,7 +198,7 @@ public class EsServiceImpl implements EsService {
         if (StringUtils.isEmpty(condition.getIndex())) {
             condition.setIndex(DEFAULT_INDEX);
         }
-        List<String> idList = queryIdsByUserId(condition.getType(), condition.getUserId());
+        List<String> idList = queryIdsByUserIdAndBatchNo(condition);
         if (CollectionUtils.isEmpty(idList)) {
             return false;
         }

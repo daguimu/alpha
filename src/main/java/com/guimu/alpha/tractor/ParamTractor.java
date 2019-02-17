@@ -42,7 +42,6 @@ public class ParamTractor implements HttpSpanInjector, HttpSpanExtractor {
                 reLogDto.setUserId(valArr[0]);
                 reLogDto.setBatchNo(valArr[1]);
                 reLogDto.setLevelStr(valArr[2]);
-                System.out.println(reLogDto.getBatchNo());
                 ThreadUtils.threadLocal.set(reLogDto);
                 break;
             }

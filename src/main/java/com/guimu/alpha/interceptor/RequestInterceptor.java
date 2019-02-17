@@ -26,13 +26,15 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
         /* //TODO 做是否登录验证，验证通过返回true。验证失败返回false。
          */
         String val = request.getHeader("levelStr");
+        String batchNo = request.getHeader("batchNo");
+        String userId = request.getHeader("userId");
         ReLogDto reLogDto = new ReLogDto();
         //TODO 此处还需修改
-        reLogDto.setLevelStr("DEBUG");
-        reLogDto.setBatchNo(Long.toString(System.currentTimeMillis()));
-        reLogDto.setUserId(137 + "");
+        reLogDto.setLevelStr(val);
+        reLogDto.setBatchNo(batchNo);
+        reLogDto.setUserId(userId);
         ThreadUtils.threadLocal.set(reLogDto);
-        LOGGER.info("请求访问接口:" + request.getRequestURL());
+//        LOGGER.info("请求访问接口:" + request.getRequestURL());
         return true;
     }
 

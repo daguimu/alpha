@@ -3,7 +3,6 @@ package com.guimu.alpha;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
-import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -12,7 +11,6 @@ import org.springframework.web.client.RestTemplate;
 
 @EnableEurekaClient
 @SpringBootApplication
-@EnableZuulProxy
 public class AlphaApplication {
 
     public static void main(String[] args) {
@@ -41,10 +39,5 @@ public class AlphaApplication {
         template.setValueSerializer(new StringRedisSerializer());
         return template;
     }
-
-//    @Bean
-//    HttpSpanInjector getFilter() {
-//        return new ParamTractor();
-//    }
 }
 

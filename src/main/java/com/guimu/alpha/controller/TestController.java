@@ -41,12 +41,17 @@ public class TestController {
 
     @RequestMapping(value = "alpha")
     public String alHe(@RequestParam String name) {
-//        logger.info("alpha" + name);
+        logger.info("alpha" + name);
         String url = "http://localhost:9900/hello";
         String restlt = restTemplate
             .getForObject(url + "?msg={1}", String.class, "msg param1");
         System.out.println(restlt);
         return "alpha" + name;
+    }
+
+    @RequestMapping(value = "/feginc")
+    public String feign(@RequestParam String name) {
+        return "from alpha feign api:" + name;
     }
 
     @RequestMapping(value = "es")
@@ -59,10 +64,16 @@ public class TestController {
     }
 
     @RequestMapping(value = "query")
-    public String red(@RequestParam String userId) {
+    public String red(@RequestParam String batchNo, @RequestParam String userId) {
+        try {
+            Thread.currentThread().sleep(1000);//毫秒
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         LogEsBase condition = new LogEsBase();
         condition.setType("LogEsBase");
         condition.setUserId(userId);
+        condition.setBatchNo(batchNo);
         List<LogEsBase> list = esService.getAllByBase(condition);
         StringJoiner joiner = new StringJoiner("<br/>", "", "");
         list.forEach(el -> joiner.add(el.getLogMsg()));
@@ -80,13 +91,12 @@ public class TestController {
 
     @RequestMapping(value = "down")
     public void downloadNet(HttpServletResponse response) {
-        String text = this.red(ThreadUtils.threadLocal.get().getBatchNo());
+        String text = this.red(ThreadUtils.threadLocal.get().getBatchNo(),
+            ThreadUtils.threadLocal.get().getUserId());
         if (StringUtils.isEmpty(text)) {
             return;
         }
         // 下载网络文件
-        int bytesum = 0;
-        int byteread;
         try {
             InputStream inStream = new ByteArrayInputStream(text.getBytes());
             response.setHeader("Content-Disposition",
