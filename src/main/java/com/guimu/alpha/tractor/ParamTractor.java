@@ -10,6 +10,7 @@ import org.springframework.cloud.sleuth.SpanTextMap;
 import org.springframework.cloud.sleuth.instrument.web.HttpSpanExtractor;
 import org.springframework.cloud.sleuth.instrument.web.HttpSpanInjector;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 /**
  * @Description:
@@ -24,6 +25,9 @@ public class ParamTractor implements HttpSpanInjector, HttpSpanExtractor {
     @Override
     public void inject(Span span, SpanTextMap carrier) {
         ReLogDto curThreadReg = ThreadUtils.threadLocal.get();
+        if (this.checkIsEmpty(curThreadReg)) {
+            return;
+        }
         StringJoiner stringJoiner = new StringJoiner("-", "", "");
         stringJoiner.add(curThreadReg.getUserId());
         stringJoiner.add(curThreadReg.getBatchNo());
@@ -47,5 +51,17 @@ public class ParamTractor implements HttpSpanInjector, HttpSpanExtractor {
             }
         }
         return null;
+    }
+
+    /**
+     * @Author: Guimu
+     * @Description: 检查ReLogDto是否合法, 不合法返回true
+     * @Param: [reLogDto]
+     * @Return: boolean
+     * @Date: 2019-02-17 22:41
+     */
+    private boolean checkIsEmpty(ReLogDto reLogDto) {
+        return StringUtils.isEmpty(reLogDto.getLevelStr()) || StringUtils
+            .isEmpty(reLogDto.getBatchNo()) || StringUtils.isEmpty(reLogDto.getUserId());
     }
 }
