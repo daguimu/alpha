@@ -1,13 +1,12 @@
 package com.guimu.alpha.interceptor;
 
 import com.guimu.alpha.dto.ReLogDto;
+import com.guimu.alpha.serviceimpl.ReLogDtoStrConventor;
 import com.guimu.alpha.utils.ThreadUtils;
+import java.util.StringJoiner;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 /**
@@ -16,9 +15,8 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
  * @create: 2018/08/13 01:57:44
  **/
 @Component
-public class RequestInterceptor extends HandlerInterceptorAdapter {
+public class RequestInterceptor extends HandlerInterceptorAdapter implements ReLogDtoStrConventor {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(RequestInterceptor.class);
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
@@ -32,19 +30,16 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
     }
 
     private void setTicket(HttpServletRequest request) {
-        String val = request.getHeader("levelStr");
-        String batchNo = request.getHeader("batchNo");
-        String userId = request.getHeader("userId");
-        ReLogDto reLogDto = new ReLogDto();
-        reLogDto.setLevelStr(val);
-        reLogDto.setBatchNo(batchNo);
-        reLogDto.setUserId(userId);
-        if (StringUtils.isEmpty(val) || StringUtils.isEmpty(batchNo) || StringUtils
-            .isEmpty(userId)) {
+        StringJoiner stringJoiner = new StringJoiner("-", "", "");
+        stringJoiner.add(request.getHeader("userId"))
+            .add(request.getHeader("batchNo"))
+            .add(request.getHeader("levelStr"));
+
+        ReLogDto reLogDto = toReLogFromStr(stringJoiner.toString());
+        if (checkIsEmpty(reLogDto)) {
             return;
         }
         ThreadUtils.threadLocal.set(reLogDto);
-
     }
 }
 

@@ -2,6 +2,7 @@ package com.guimu.alpha.controller;
 
 import com.guimu.alpha.model.LogEsBase;
 import com.guimu.alpha.service.EsService;
+import com.guimu.alpha.serviceimpl.SleuthService;
 import com.guimu.alpha.utils.RedisUtils;
 import com.guimu.alpha.utils.ThreadUtils;
 import java.io.BufferedInputStream;
@@ -37,6 +38,8 @@ public class TestController {
     private RestTemplate restTemplate;
     @Autowired
     private EsService esService;
+    @Autowired
+    private SleuthService sleuthService;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @RequestMapping(value = "alpha")
@@ -48,6 +51,7 @@ public class TestController {
         System.out.println(restlt);
         return "alpha" + name;
     }
+
 
     @RequestMapping(value = "/feginc")
     public String feign(@RequestParam String name) {
@@ -87,6 +91,14 @@ public class TestController {
         logEsBase.setUserId(userId);
         esService.clearUserType(logEsBase);
         return "ok";
+    }
+
+    @RequestMapping(value = "test")
+    public String test() throws Exception {
+        logger.info("调用异步方法开始");
+        sleuthService.asyncMethod();
+        logger.info("调用异步方法结束");
+        return "it's  ok";
     }
 
     @RequestMapping(value = "down")
