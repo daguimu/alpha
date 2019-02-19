@@ -1,4 +1,4 @@
-package com.guimu.alpha.serviceimpl;
+package com.guimu.alpha.service;
 
 import com.guimu.alpha.dto.ReLogDto;
 import java.util.StringJoiner;

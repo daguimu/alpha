@@ -1,7 +1,7 @@
-package com.guimu.alpha.spanrun;
+package com.guimu.alpha.runable;
 
 import com.guimu.alpha.consts.ThreadLocalConstEnum;
-import com.guimu.alpha.serviceimpl.ReLogDtoStrConventor;
+import com.guimu.alpha.service.ReLogDtoStrConventor;
 import com.guimu.alpha.utils.ThreadUtils;
 import java.lang.ref.Reference;
 import java.lang.reflect.Array;
@@ -14,7 +14,7 @@ import org.springframework.cloud.sleuth.instrument.async.SpanContinuingTraceRunn
 
 /**
  * @Description:
- * @Author: Guimu
+ * @Author: Guimu 主要重写run方法,以加入initReLogThreadLocal()方法,从异步线程中提取变量数据到线程变量中
  * @Create: 2019/02/18 22:07:32
  **/
 
@@ -70,6 +70,10 @@ public class ReLogSpanContinuingTraceRunnable extends SpanContinuingTraceRunnabl
                         span.getBaggage().forEach((k, v) -> {
                             if (k.equalsIgnoreCase(
                                 ThreadLocalConstEnum.RE_LOG_BATCH_NO.getDescStr())) {
+                                //如果该线程变量中已经有对应的值,将旧的值移除掉放入新的值,以此避免不同的请求复用线程池线程的时候复用线程变量
+                                if (!this.checkIsEmpty(ThreadUtils.threadLocal.get())) {
+                                    ThreadUtils.threadLocal.remove();
+                                }
                                 ThreadUtils.threadLocal.set(this.toReLogFromStr(v));
                             }
                         });

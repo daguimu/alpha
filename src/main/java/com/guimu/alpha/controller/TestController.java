@@ -128,4 +128,14 @@ public class TestController {
             e.printStackTrace();
         }
     }
+
+    @RequestMapping(value = "image")
+    public void img(@RequestParam int count) throws Exception {
+        logger.info("调用image开始");
+        for (int i = 0; i < count; i++) {
+            sleuthService.asyncMethod();
+        }
+        logger.info("调用image结束");
+    }
+
 }

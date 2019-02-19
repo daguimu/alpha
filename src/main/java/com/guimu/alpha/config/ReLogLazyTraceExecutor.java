@@ -2,8 +2,8 @@ package com.guimu.alpha.config;
 
 import com.guimu.alpha.consts.ThreadLocalConstEnum;
 import com.guimu.alpha.dto.ReLogDto;
-import com.guimu.alpha.serviceimpl.ReLogDtoStrConventor;
-import com.guimu.alpha.spanrun.ReLogSpanContinuingTraceRunnable;
+import com.guimu.alpha.runable.ReLogSpanContinuingTraceRunnable;
+import com.guimu.alpha.service.ReLogDtoStrConventor;
 import com.guimu.alpha.utils.ThreadUtils;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.Executor;

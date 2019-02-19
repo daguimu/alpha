@@ -1,7 +1,7 @@
 package com.guimu.alpha.interceptor;
 
 import com.guimu.alpha.dto.ReLogDto;
-import com.guimu.alpha.serviceimpl.ReLogDtoStrConventor;
+import com.guimu.alpha.service.ReLogDtoStrConventor;
 import com.guimu.alpha.utils.ThreadUtils;
 import java.util.StringJoiner;
 import javax.servlet.http.HttpServletRequest;

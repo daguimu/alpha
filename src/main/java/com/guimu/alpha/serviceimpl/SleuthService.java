@@ -1,6 +1,7 @@
 package com.guimu.alpha.serviceimpl;
 
 import com.guimu.alpha.controller.TestController;
+import com.guimu.alpha.service.ReLogDtoStrConventor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

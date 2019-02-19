@@ -1,7 +1,7 @@
 package com.guimu.alpha.tractor;
 
 import com.guimu.alpha.dto.ReLogDto;
-import com.guimu.alpha.serviceimpl.ReLogDtoStrConventor;
+import com.guimu.alpha.service.ReLogDtoStrConventor;
 import com.guimu.alpha.utils.ThreadUtils;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -37,6 +37,11 @@ public class ParamTractor implements HttpSpanInjector, HttpSpanExtractor, ReLogD
             Entry<String, String> tempEntry = iterator.next();
             if (tempEntry.getKey().equalsIgnoreCase(LOG_KEY)) {
                 ReLogDto reLogDto = toReLogFromStr(tempEntry.getValue());
+
+                //如果该线程变量中已经有对应的值,将旧的值移除掉放入新的值,以此避免不同的请求复用线程池线程的时候复用线程变量
+                if (!this.checkIsEmpty(ThreadUtils.threadLocal.get())) {
+                    ThreadUtils.threadLocal.remove();
+                }
                 ThreadUtils.threadLocal.set(reLogDto);
                 break;
             }
